@@ -9,12 +9,19 @@
 #import "ViewController.h"
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
+#define TEX_COORD_MAX   1.0f
+#define SQUARE_SIDE 3.0f
 
 // Uniform index.
 enum
 {
     UNIFORM_MODELVIEWPROJECTION_MATRIX,
     UNIFORM_NORMAL_MATRIX,
+    UNIFORM_TEXTURE,
+    UNIFORM_TEX_COORD,
+    UNIFORM_A,
+    UNIFORM_Z,
+    UNIFORM_OFFSET,
     NUM_UNIFORMS
 };
 GLint uniforms[NUM_UNIFORMS];
@@ -27,51 +34,18 @@ enum
     NUM_ATTRIBUTES
 };
 
-GLfloat gCubeVertexData[216] = 
+GLfloat gCubeVertexData[6*5] =
 {
     // Data layout for each line below is:
-    // positionX, positionY, positionZ,     normalX, normalY, normalZ,
-    0.5f, -0.5f, -0.5f,        1.0f, 0.0f, 0.0f,
-    0.5f, 0.5f, -0.5f,         1.0f, 0.0f, 0.0f,
-    0.5f, -0.5f, 0.5f,         1.0f, 0.0f, 0.0f,
-    0.5f, -0.5f, 0.5f,         1.0f, 0.0f, 0.0f,
-    0.5f, 0.5f, -0.5f,          1.0f, 0.0f, 0.0f,
-    0.5f, 0.5f, 0.5f,         1.0f, 0.0f, 0.0f,
+    // positionX, positionY, positionZ,     texX, texY,
+    -SQUARE_SIDE, -SQUARE_SIDE, 0.5f,        0.0f, 0.0f,
+    SQUARE_SIDE, -SQUARE_SIDE, 0.5f,        TEX_COORD_MAX, 0.0f,
+    -SQUARE_SIDE, SQUARE_SIDE, 0.5f,         0.0f, TEX_COORD_MAX,
+    -SQUARE_SIDE, SQUARE_SIDE, 0.5f,         0.0f, TEX_COORD_MAX,
+    SQUARE_SIDE, -SQUARE_SIDE, 0.5f,         TEX_COORD_MAX, 0.0f,
+    SQUARE_SIDE, SQUARE_SIDE, 0.5f,          TEX_COORD_MAX, TEX_COORD_MAX
     
-    0.5f, 0.5f, -0.5f,         0.0f, 1.0f, 0.0f,
-    -0.5f, 0.5f, -0.5f,        0.0f, 1.0f, 0.0f,
-    0.5f, 0.5f, 0.5f,          0.0f, 1.0f, 0.0f,
-    0.5f, 0.5f, 0.5f,          0.0f, 1.0f, 0.0f,
-    -0.5f, 0.5f, -0.5f,        0.0f, 1.0f, 0.0f,
-    -0.5f, 0.5f, 0.5f,         0.0f, 1.0f, 0.0f,
-    
-    -0.5f, 0.5f, -0.5f,        -1.0f, 0.0f, 0.0f,
-    -0.5f, -0.5f, -0.5f,       -1.0f, 0.0f, 0.0f,
-    -0.5f, 0.5f, 0.5f,         -1.0f, 0.0f, 0.0f,
-    -0.5f, 0.5f, 0.5f,         -1.0f, 0.0f, 0.0f,
-    -0.5f, -0.5f, -0.5f,       -1.0f, 0.0f, 0.0f,
-    -0.5f, -0.5f, 0.5f,        -1.0f, 0.0f, 0.0f,
-    
-    -0.5f, -0.5f, -0.5f,       0.0f, -1.0f, 0.0f,
-    0.5f, -0.5f, -0.5f,        0.0f, -1.0f, 0.0f,
-    -0.5f, -0.5f, 0.5f,        0.0f, -1.0f, 0.0f,
-    -0.5f, -0.5f, 0.5f,        0.0f, -1.0f, 0.0f,
-    0.5f, -0.5f, -0.5f,        0.0f, -1.0f, 0.0f,
-    0.5f, -0.5f, 0.5f,         0.0f, -1.0f, 0.0f,
-    
-    0.5f, 0.5f, 0.5f,          0.0f, 0.0f, 1.0f,
-    -0.5f, 0.5f, 0.5f,         0.0f, 0.0f, 1.0f,
-    0.5f, -0.5f, 0.5f,         0.0f, 0.0f, 1.0f,
-    0.5f, -0.5f, 0.5f,         0.0f, 0.0f, 1.0f,
-    -0.5f, 0.5f, 0.5f,         0.0f, 0.0f, 1.0f,
-    -0.5f, -0.5f, 0.5f,        0.0f, 0.0f, 1.0f,
-    
-    0.5f, -0.5f, -0.5f,        0.0f, 0.0f, -1.0f,
-    -0.5f, -0.5f, -0.5f,       0.0f, 0.0f, -1.0f,
-    0.5f, 0.5f, -0.5f,         0.0f, 0.0f, -1.0f,
-    0.5f, 0.5f, -0.5f,         0.0f, 0.0f, -1.0f,
-    -0.5f, -0.5f, -0.5f,       0.0f, 0.0f, -1.0f,
-    -0.5f, 0.5f, -0.5f,        0.0f, 0.0f, -1.0f
+
 };
 
 @interface ViewController () {
@@ -80,9 +54,13 @@ GLfloat gCubeVertexData[216] =
     GLKMatrix4 _modelViewProjectionMatrix;
     GLKMatrix3 _normalMatrix;
     float _rotation;
+    float _zoom;
+    float _offset;
     
     GLuint _vertexArray;
     GLuint _vertexBuffer;
+    
+    GLuint _texture;
 }
 @property (strong, nonatomic) EAGLContext *context;
 @property (strong, nonatomic) GLKBaseEffect *effect;
@@ -113,6 +91,7 @@ GLfloat gCubeVertexData[216] =
     view.drawableDepthFormat = GLKViewDrawableDepthFormat24;
     
     [self setupGL];
+    
 }
 
 - (void)dealloc
@@ -147,6 +126,7 @@ GLfloat gCubeVertexData[216] =
     [EAGLContext setCurrentContext:self.context];
     
     [self loadShaders];
+    [self setupTextures];
     
     self.effect = [[GLKBaseEffect alloc] init];
     self.effect.light0.enabled = GL_TRUE;
@@ -162,9 +142,13 @@ GLfloat gCubeVertexData[216] =
     glBufferData(GL_ARRAY_BUFFER, sizeof(gCubeVertexData), gCubeVertexData, GL_STATIC_DRAW);
     
     glEnableVertexAttribArray(GLKVertexAttribPosition);
-    glVertexAttribPointer(GLKVertexAttribPosition, 3, GL_FLOAT, GL_FALSE, 24, BUFFER_OFFSET(0));
-    glEnableVertexAttribArray(GLKVertexAttribNormal);
-    glVertexAttribPointer(GLKVertexAttribNormal, 3, GL_FLOAT, GL_FALSE, 24, BUFFER_OFFSET(12));
+    glVertexAttribPointer(GLKVertexAttribPosition, 3, GL_FLOAT, GL_FALSE, 20, BUFFER_OFFSET(0));
+    //glEnableVertexAttribArray(GLKVertexAttribNormal);
+    //glVertexAttribPointer(GLKVertexAttribNormal, 3, GL_FLOAT, GL_FALSE, 24, BUFFER_OFFSET(12));
+    
+    glEnableVertexAttribArray(uniforms[UNIFORM_TEX_COORD]);
+    glVertexAttribPointer(uniforms[UNIFORM_TEX_COORD], 2, GL_FLOAT, GL_FALSE, 20, BUFFER_OFFSET(12));
+    
     
     glBindVertexArrayOES(0);
 }
@@ -189,30 +173,18 @@ GLfloat gCubeVertexData[216] =
 - (void)update
 {
     float aspect = fabsf(self.view.bounds.size.width / self.view.bounds.size.height);
-    GLKMatrix4 projectionMatrix = GLKMatrix4MakePerspective(GLKMathDegreesToRadians(65.0f), aspect, 0.1f, 100.0f);
     
-    self.effect.transform.projectionMatrix = projectionMatrix;
-    
-    GLKMatrix4 baseModelViewMatrix = GLKMatrix4MakeTranslation(0.0f, 0.0f, -4.0f);
-    baseModelViewMatrix = GLKMatrix4Rotate(baseModelViewMatrix, _rotation, 0.0f, 1.0f, 0.0f);
-    
-    // Compute the model view matrix for the object rendered with GLKit
-    GLKMatrix4 modelViewMatrix = GLKMatrix4MakeTranslation(0.0f, 0.0f, -1.5f);
-    modelViewMatrix = GLKMatrix4Rotate(modelViewMatrix, _rotation, 1.0f, 1.0f, 1.0f);
-    modelViewMatrix = GLKMatrix4Multiply(baseModelViewMatrix, modelViewMatrix);
-    
-    self.effect.transform.modelviewMatrix = modelViewMatrix;
-    
-    // Compute the model view matrix for the object rendered with ES2
-    modelViewMatrix = GLKMatrix4MakeTranslation(0.0f, 0.0f, 1.5f);
-    modelViewMatrix = GLKMatrix4Rotate(modelViewMatrix, _rotation, 1.0f, 1.0f, 1.0f);
-    modelViewMatrix = GLKMatrix4Multiply(baseModelViewMatrix, modelViewMatrix);
-    
-    _normalMatrix = GLKMatrix3InvertAndTranspose(GLKMatrix4GetMatrix3(modelViewMatrix), NULL);
+    GLKMatrix4 projectionMatrix = GLKMatrix4MakePerspective(GLKMathDegreesToRadians(35.0f), aspect, 4.0f, 10.0f);
+    GLKMatrix4 modelViewMatrix = GLKMatrix4MakeTranslation(0.0f, 0.0f, -10.0f);
     
     _modelViewProjectionMatrix = GLKMatrix4Multiply(projectionMatrix, modelViewMatrix);
     
     _rotation += self.timeSinceLastUpdate * 0.5f;
+    _rotation = _rotation > 2*M_PI ? _rotation - 2*M_PI : _rotation;
+    _zoom += self.timeSinceLastUpdate * 0.8f;
+    _zoom = _zoom > 2*M_PI ? _zoom - 2*M_PI : _zoom;
+    _offset += self.timeSinceLastUpdate * 0.1f;
+    _offset = _offset > 1 ? _offset - 1 : _offset;
 }
 
 - (void)glkView:(GLKView *)view drawInRect:(CGRect)rect
@@ -222,18 +194,25 @@ GLfloat gCubeVertexData[216] =
     
     glBindVertexArrayOES(_vertexArray);
     
-    // Render the object with GLKit
-    [self.effect prepareToDraw];
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, _texture);
+    glUniform1i(uniforms[UNIFORM_TEXTURE], 0);
+    glUniform1f(uniforms[UNIFORM_A], _rotation);
+    glUniform1f(uniforms[UNIFORM_Z], 0.6+cos(_zoom)/2);
+    glUniform1f(uniforms[UNIFORM_OFFSET], _offset);
+    //glUniform1f(uniforms[UNIFORM_A], 0);
+    //glUniform1f(uniforms[UNIFORM_Z], 1);
+
     
-    glDrawArrays(GL_TRIANGLES, 0, 36);
+    //NSLog(@"Rotation %f",_rotation);
     
-    // Render the object again with ES2
+    // Render the object  with ES2
     glUseProgram(_program);
     
     glUniformMatrix4fv(uniforms[UNIFORM_MODELVIEWPROJECTION_MATRIX], 1, 0, _modelViewProjectionMatrix.m);
-    glUniformMatrix3fv(uniforms[UNIFORM_NORMAL_MATRIX], 1, 0, _normalMatrix.m);
+    //glUniformMatrix3fv(uniforms[UNIFORM_NORMAL_MATRIX], 1, 0, _normalMatrix.m);
     
-    glDrawArrays(GL_TRIANGLES, 0, 36);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
 #pragma mark -  OpenGL ES 2 shader compilation
@@ -269,7 +248,8 @@ GLfloat gCubeVertexData[216] =
     // Bind attribute locations.
     // This needs to be done prior to linking.
     glBindAttribLocation(_program, GLKVertexAttribPosition, "position");
-    glBindAttribLocation(_program, GLKVertexAttribNormal, "normal");
+    //glBindAttribLocation(_program, GLKVertexAttribNormal, "normal");
+    
     
     // Link program.
     if (![self linkProgram:_program]) {
@@ -293,7 +273,15 @@ GLfloat gCubeVertexData[216] =
     
     // Get uniform locations.
     uniforms[UNIFORM_MODELVIEWPROJECTION_MATRIX] = glGetUniformLocation(_program, "modelViewProjectionMatrix");
-    uniforms[UNIFORM_NORMAL_MATRIX] = glGetUniformLocation(_program, "normalMatrix");
+    //uniforms[UNIFORM_NORMAL_MATRIX] = glGetUniformLocation(_program, "normalMatrix");
+    uniforms[UNIFORM_TEXTURE] = glGetUniformLocation(_program,"tex");
+    
+    uniforms[UNIFORM_TEX_COORD] = glGetAttribLocation(_program, "TexCoordIn");
+
+    uniforms[UNIFORM_A] = glGetUniformLocation(_program, "a");
+    uniforms[UNIFORM_Z] = glGetUniformLocation(_program, "z");
+    uniforms[UNIFORM_OFFSET] = glGetUniformLocation(_program, "offset");
+
     
     // Release vertex and fragment shaders.
     if (vertShader) {
@@ -386,6 +374,50 @@ GLfloat gCubeVertexData[216] =
     }
     
     return YES;
+}
+
+
+# pragma mark - texture helpers
+
+- (GLuint)setupTexture:(NSString *)fileName {
+    
+    // 1
+    CGImageRef spriteImage = [UIImage imageNamed:fileName].CGImage;
+    if (!spriteImage) {
+        NSLog(@"Failed to load image %@", fileName);
+        exit(1);
+    }
+    
+    // 2
+    size_t width = CGImageGetWidth(spriteImage);
+    size_t height = CGImageGetHeight(spriteImage);
+    
+    GLubyte * spriteData = (GLubyte *) calloc(width*height*4, sizeof(GLubyte));
+    
+    CGContextRef spriteContext = CGBitmapContextCreate(spriteData, width, height, 8, width*4, CGImageGetColorSpace(spriteImage), kCGImageAlphaPremultipliedLast);
+    
+    // 3
+    CGContextDrawImage(spriteContext, CGRectMake(0, 0, width, height), spriteImage);
+    
+    CGContextRelease(spriteContext);
+    
+    // 4
+    GLuint texName;
+    glGenTextures(1, &texName);
+    glBindTexture(GL_TEXTURE_2D, texName);
+    
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, spriteData);
+    
+    free(spriteData);
+    return texName;
+    
+}
+
+- (void)setupTextures
+{
+    _texture=[self setupTexture:@"yeen1.jpg"];
 }
 
 @end

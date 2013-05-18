@@ -22,19 +22,20 @@
 		3C05FD331744FE54005610D7 /* Shader.fsh in Resources */ = {isa = PBXBuildFile; fileRef = 3C05FD321744FE54005610D7 /* Shader.fsh */; };
 		3C05FD351744FE54005610D7 /* Shader.vsh in Resources */ = {isa = PBXBuildFile; fileRef = 3C05FD341744FE54005610D7 /* Shader.vsh */; };
 		3C05FD381744FE54005610D7 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3C05FD371744FE54005610D7 /* ViewController.m */; };
+		3C782E111746E6AE00D41911 /* yeen1.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 3C782E101746E6AE00D41911 /* yeen1.jpg */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		3C05FD101744FE54005610D7 /* Rotozoomer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Rotozoomer.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		3C05FD101744FE54005610D7 /* Plasma.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Plasma.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3C05FD131744FE54005610D7 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		3C05FD151744FE54005610D7 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		3C05FD171744FE54005610D7 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		3C05FD191744FE54005610D7 /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
 		3C05FD1B1744FE54005610D7 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
-		3C05FD1F1744FE54005610D7 /* Rotozoomer-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Rotozoomer-Info.plist"; sourceTree = "<group>"; };
+		3C05FD1F1744FE54005610D7 /* Plasma-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Plasma-Info.plist"; sourceTree = "<group>"; };
 		3C05FD211744FE54005610D7 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		3C05FD231744FE54005610D7 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		3C05FD251744FE54005610D7 /* Rotozoomer-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Rotozoomer-Prefix.pch"; sourceTree = "<group>"; };
+		3C05FD251744FE54005610D7 /* Plasma-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Plasma-Prefix.pch"; sourceTree = "<group>"; };
 		3C05FD261744FE54005610D7 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		3C05FD271744FE54005610D7 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		3C05FD291744FE54005610D7 /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Default.png; sourceTree = "<group>"; };
@@ -45,6 +46,7 @@
 		3C05FD341744FE54005610D7 /* Shader.vsh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; name = Shader.vsh; path = Shaders/Shader.vsh; sourceTree = "<group>"; };
 		3C05FD361744FE54005610D7 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
 		3C05FD371744FE54005610D7 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		3C782E101746E6AE00D41911 /* yeen1.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = yeen1.jpg; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -66,7 +68,7 @@
 		3C05FD071744FE54005610D7 = {
 			isa = PBXGroup;
 			children = (
-				3C05FD1D1744FE54005610D7 /* Rotozoomer */,
+				3C05FD1D1744FE54005610D7 /* Plasma */,
 				3C05FD121744FE54005610D7 /* Frameworks */,
 				3C05FD111744FE54005610D7 /* Products */,
 			);
@@ -75,7 +77,7 @@
 		3C05FD111744FE54005610D7 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				3C05FD101744FE54005610D7 /* Rotozoomer.app */,
+				3C05FD101744FE54005610D7 /* Plasma.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -92,7 +94,7 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		3C05FD1D1744FE54005610D7 /* Rotozoomer */ = {
+		3C05FD1D1744FE54005610D7 /* Plasma */ = {
 			isa = PBXGroup;
 			children = (
 				3C05FD261744FE54005610D7 /* AppDelegate.h */,
@@ -100,20 +102,21 @@
 				3C05FD2F1744FE54005610D7 /* MainStoryboard.storyboard */,
 				3C05FD321744FE54005610D7 /* Shader.fsh */,
 				3C05FD341744FE54005610D7 /* Shader.vsh */,
+				3C782E101746E6AE00D41911 /* yeen1.jpg */,
 				3C05FD361744FE54005610D7 /* ViewController.h */,
 				3C05FD371744FE54005610D7 /* ViewController.m */,
 				3C05FD1E1744FE54005610D7 /* Supporting Files */,
 			);
-			path = Rotozoomer;
+			path = Plasma;
 			sourceTree = "<group>";
 		};
 		3C05FD1E1744FE54005610D7 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				3C05FD1F1744FE54005610D7 /* Rotozoomer-Info.plist */,
+				3C05FD1F1744FE54005610D7 /* Plasma-Info.plist */,
 				3C05FD201744FE54005610D7 /* InfoPlist.strings */,
 				3C05FD231744FE54005610D7 /* main.m */,
-				3C05FD251744FE54005610D7 /* Rotozoomer-Prefix.pch */,
+				3C05FD251744FE54005610D7 /* Plasma-Prefix.pch */,
 				3C05FD291744FE54005610D7 /* Default.png */,
 				3C05FD2B1744FE54005610D7 /* Default@2x.png */,
 				3C05FD2D1744FE54005610D7 /* Default-568h@2x.png */,
@@ -124,9 +127,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		3C05FD0F1744FE54005610D7 /* Rotozoomer */ = {
+		3C05FD0F1744FE54005610D7 /* Plasma */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 3C05FD3B1744FE54005610D7 /* Build configuration list for PBXNativeTarget "Rotozoomer" */;
+			buildConfigurationList = 3C05FD3B1744FE54005610D7 /* Build configuration list for PBXNativeTarget "Plasma" */;
 			buildPhases = (
 				3C05FD0C1744FE54005610D7 /* Sources */,
 				3C05FD0D1744FE54005610D7 /* Frameworks */,
@@ -136,9 +139,9 @@
 			);
 			dependencies = (
 			);
-			name = Rotozoomer;
+			name = Plasma;
 			productName = Rotozoomer;
-			productReference = 3C05FD101744FE54005610D7 /* Rotozoomer.app */;
+			productReference = 3C05FD101744FE54005610D7 /* Plasma.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -150,7 +153,7 @@
 				LastUpgradeCheck = 0460;
 				ORGANIZATIONNAME = "Richard Smith";
 			};
-			buildConfigurationList = 3C05FD0B1744FE54005610D7 /* Build configuration list for PBXProject "Rotozoomer" */;
+			buildConfigurationList = 3C05FD0B1744FE54005610D7 /* Build configuration list for PBXProject "Plasma" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -162,7 +165,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				3C05FD0F1744FE54005610D7 /* Rotozoomer */,
+				3C05FD0F1744FE54005610D7 /* Plasma */,
 			);
 		};
 /* End PBXProject section */
@@ -179,6 +182,7 @@
 				3C05FD311744FE54005610D7 /* MainStoryboard.storyboard in Resources */,
 				3C05FD331744FE54005610D7 /* Shader.fsh in Resources */,
 				3C05FD351744FE54005610D7 /* Shader.vsh in Resources */,
+				3C782E111746E6AE00D41911 /* yeen1.jpg in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -279,9 +283,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "Rotozoomer/Rotozoomer-Prefix.pch";
-				INFOPLIST_FILE = "Rotozoomer/Rotozoomer-Info.plist";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				GCC_PREFIX_HEADER = "Plasma/Plasma-Prefix.pch";
+				INFOPLIST_FILE = "Plasma/Plasma-Info.plist";
+				PRODUCT_NAME = Plasma;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -290,9 +294,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "Rotozoomer/Rotozoomer-Prefix.pch";
-				INFOPLIST_FILE = "Rotozoomer/Rotozoomer-Info.plist";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				GCC_PREFIX_HEADER = "Plasma/Plasma-Prefix.pch";
+				INFOPLIST_FILE = "Plasma/Plasma-Info.plist";
+				PRODUCT_NAME = Plasma;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
@@ -300,7 +304,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		3C05FD0B1744FE54005610D7 /* Build configuration list for PBXProject "Rotozoomer" */ = {
+		3C05FD0B1744FE54005610D7 /* Build configuration list for PBXProject "Plasma" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				3C05FD391744FE54005610D7 /* Debug */,
@@ -309,13 +313,14 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		3C05FD3B1744FE54005610D7 /* Build configuration list for PBXNativeTarget "Rotozoomer" */ = {
+		3C05FD3B1744FE54005610D7 /* Build configuration list for PBXNativeTarget "Plasma" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				3C05FD3C1744FE54005610D7 /* Debug */,
 				3C05FD3D1744FE54005610D7 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
