@@ -10,7 +10,7 @@
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 #define TEX_COORD_MAX   1.0f
-#define SQUARE_SIDE 3.0f
+#define SQUARE_SIDE 0.99f
 
 // Uniform index.
 enum
@@ -34,27 +34,14 @@ enum
     NUM_ATTRIBUTES
 };
 
-GLfloat gCubeVertexData[6*5] =
-{
-    // Data layout for each line below is:
-    // positionX, positionY, positionZ,     texX, texY,
-    -SQUARE_SIDE, -SQUARE_SIDE, 0.5f,        0.0f, 0.0f,
-    SQUARE_SIDE, -SQUARE_SIDE, 0.5f,        TEX_COORD_MAX, 0.0f,
-    -SQUARE_SIDE, SQUARE_SIDE, 0.5f,         0.0f, TEX_COORD_MAX,
-    -SQUARE_SIDE, SQUARE_SIDE, 0.5f,         0.0f, TEX_COORD_MAX,
-    SQUARE_SIDE, -SQUARE_SIDE, 0.5f,         TEX_COORD_MAX, 0.0f,
-    SQUARE_SIDE, SQUARE_SIDE, 0.5f,          TEX_COORD_MAX, TEX_COORD_MAX
-    
-
-};
+GLfloat * gVertexData;
+GLint vertexCount;
 
 @interface ViewController () {
     GLuint _program;
     
     GLKMatrix4 _modelViewProjectionMatrix;
-    GLKMatrix3 _normalMatrix;
-    float _rotation;
-    float _zoom;
+    
     float _offset;
     float _direction;
     
@@ -64,7 +51,6 @@ GLfloat gCubeVertexData[6*5] =
     GLuint _texture;
 }
 @property (strong, nonatomic) EAGLContext *context;
-@property (strong, nonatomic) GLKBaseEffect *effect;
 
 - (void)setupGL;
 - (void)tearDownGL;
@@ -91,9 +77,37 @@ GLfloat gCubeVertexData[6*5] =
     view.context = self.context;
     view.drawableDepthFormat = GLKViewDrawableDepthFormat24;
     
-    [self setupGL];
+    //set initial direction
+    _direction=1;
     
-    _direction = 1;
+    //calculate aspect ratio of screen
+    float aspect = fabsf(self.view.bounds.size.width / self.view.bounds.size.height);
+    
+    
+    //create orthographic projection (identity) matrix with aspect ratio correction
+    _modelViewProjectionMatrix = GLKMatrix4Make(1.0f / aspect, 0.0f, 0.0f, 0.0f,
+                                                0.0f, 1.0f, 0.0f, 0.0f,
+                                                0.0f, 0.0f, 1.0f, 0.0f,
+                                                0.0f, 0.0f, 0.0f, 1.0f);
+    
+    //make a quad that fills the screen
+    gVertexData = (GLfloat [6*5])
+    {
+        // Data layout for each line below is:
+        // positionX, positionY, positionZ,     texX, texY,
+        -aspect, -1.0f, 0.0f,        0.0f, 0.0f,
+        aspect, -1.0f, 0.0f,        TEX_COORD_MAX, 0.0f,
+        -aspect, 1.0f, 0.0f,         0.0f, TEX_COORD_MAX/aspect,
+        -aspect, 1.0f, 0.0f,         0.0f, TEX_COORD_MAX/aspect,
+        aspect, -1.0f, 0.0f,         TEX_COORD_MAX, 0.0f,
+        aspect, 1.0f, 0.0f,          TEX_COORD_MAX, TEX_COORD_MAX/aspect
+     };
+
+    vertexCount = 6*5;
+    
+    
+    //set up GL
+    [self setupGL];
     
 }
 
@@ -131,9 +145,6 @@ GLfloat gCubeVertexData[6*5] =
     [self loadShaders];
     [self setupTextures];
     
-    self.effect = [[GLKBaseEffect alloc] init];
-    self.effect.light0.enabled = GL_TRUE;
-    self.effect.light0.diffuseColor = GLKVector4Make(1.0f, 0.4f, 0.4f, 1.0f);
     
     glEnable(GL_DEPTH_TEST);
     
@@ -142,12 +153,10 @@ GLfloat gCubeVertexData[6*5] =
     
     glGenBuffers(1, &_vertexBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, _vertexBuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(gCubeVertexData), gCubeVertexData, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, vertexCount * sizeof(GLfloat), gVertexData, GL_STATIC_DRAW);
     
     glEnableVertexAttribArray(GLKVertexAttribPosition);
     glVertexAttribPointer(GLKVertexAttribPosition, 3, GL_FLOAT, GL_FALSE, 20, BUFFER_OFFSET(0));
-    //glEnableVertexAttribArray(GLKVertexAttribNormal);
-    //glVertexAttribPointer(GLKVertexAttribNormal, 3, GL_FLOAT, GL_FALSE, 24, BUFFER_OFFSET(12));
     
     glEnableVertexAttribArray(uniforms[UNIFORM_TEX_COORD]);
     glVertexAttribPointer(uniforms[UNIFORM_TEX_COORD], 2, GL_FLOAT, GL_FALSE, 20, BUFFER_OFFSET(12));
@@ -162,9 +171,7 @@ GLfloat gCubeVertexData[6*5] =
     
     glDeleteBuffers(1, &_vertexBuffer);
     glDeleteVertexArraysOES(1, &_vertexArray);
-    
-    self.effect = nil;
-    
+        
     if (_program) {
         glDeleteProgram(_program);
         _program = 0;
@@ -175,24 +182,14 @@ GLfloat gCubeVertexData[6*5] =
 
 - (void)update
 {
-    float aspect = fabsf(self.view.bounds.size.width / self.view.bounds.size.height);
     
-    GLKMatrix4 projectionMatrix = GLKMatrix4MakePerspective(GLKMathDegreesToRadians(35.0f), aspect, 4.0f, 10.0f);
-    GLKMatrix4 modelViewMatrix = GLKMatrix4MakeTranslation(0.0f, 0.0f, -10.0f);
-    
-    _modelViewProjectionMatrix = GLKMatrix4Multiply(projectionMatrix, modelViewMatrix);
-    
-    _rotation += self.timeSinceLastUpdate * 1.0f;
-    _rotation = _rotation > 2*M_PI ? _rotation - 2*M_PI : _rotation;
-    _zoom += self.timeSinceLastUpdate * 0.8f;
-    _zoom = _zoom > 2*M_PI ? _zoom - 2*M_PI : _zoom;
     _offset += self.timeSinceLastUpdate * 0.8f * _direction;
     //NSLog(@"offset %f",_offset);
     //if (_offset<0 || _offset>10)
     //{
-       // _direction = -_direction;
+    // _direction = -_direction;
     //}
-
+    
     if (_offset > 12.0 * M_PI)
     {
         NSLog(@"Offset %f",_offset);
@@ -213,17 +210,11 @@ GLfloat gCubeVertexData[6*5] =
     glUniform1f(uniforms[UNIFORM_A], _rotation);
     glUniform1f(uniforms[UNIFORM_Z], 0.6+cos(_zoom)/2);
     glUniform1f(uniforms[UNIFORM_OFFSET], _offset);
-    //glUniform1f(uniforms[UNIFORM_A], 0);
-    //glUniform1f(uniforms[UNIFORM_Z], 1);
 
-    
-    //NSLog(@"Rotation %f",_rotation);
-    
     // Render the object  with ES2
     glUseProgram(_program);
     
     glUniformMatrix4fv(uniforms[UNIFORM_MODELVIEWPROJECTION_MATRIX], 1, 0, _modelViewProjectionMatrix.m);
-    //glUniformMatrix3fv(uniforms[UNIFORM_NORMAL_MATRIX], 1, 0, _normalMatrix.m);
     
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }
@@ -261,7 +252,6 @@ GLfloat gCubeVertexData[6*5] =
     // Bind attribute locations.
     // This needs to be done prior to linking.
     glBindAttribLocation(_program, GLKVertexAttribPosition, "position");
-    //glBindAttribLocation(_program, GLKVertexAttribNormal, "normal");
     
     
     // Link program.
@@ -394,27 +384,43 @@ GLfloat gCubeVertexData[6*5] =
 
 - (GLuint)setupTexture:(NSString *)fileName {
     
-    // 1
+    //load file in to CGImage
     CGImageRef spriteImage = [UIImage imageNamed:fileName].CGImage;
     if (!spriteImage) {
         NSLog(@"Failed to load image %@", fileName);
         exit(1);
     }
     
-    // 2
     size_t width = CGImageGetWidth(spriteImage);
     size_t height = CGImageGetHeight(spriteImage);
     
+#if defined(DEBUG)
+    //assert that the image is square
+    if (!( width == height ))
+    {
+        NSLog(@"Texture file %@ is not square (%zd by %zd px).",fileName,width,height);
+        exit(1);
+    }
+    //assert that dimensions are powers of two
+    if (width & (width - 1))
+    {
+        NSLog(@"Texture file %@ does not have dimensions that are a power of 2 (%zd by %zd px).",fileName,width,height);
+        exit(1);
+    }
+#endif
+    
+    //allocate memory for texture bytes and draw texture into them
     GLubyte * spriteData = (GLubyte *) calloc(width*height*4, sizeof(GLubyte));
     
+    //NOTE
+    //Do some colour depth checks and conversion here
     CGContextRef spriteContext = CGBitmapContextCreate(spriteData, width, height, 8, width*4, CGImageGetColorSpace(spriteImage), kCGImageAlphaPremultipliedLast);
     
-    // 3
     CGContextDrawImage(spriteContext, CGRectMake(0, 0, width, height), spriteImage);
     
     CGContextRelease(spriteContext);
     
-    // 4
+    //bind texture
     GLuint texName;
     glGenTextures(1, &texName);
     glBindTexture(GL_TEXTURE_2D, texName);
