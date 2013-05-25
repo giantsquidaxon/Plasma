@@ -22,7 +22,6 @@
 		3C05FD331744FE54005610D7 /* Shader.fsh in Resources */ = {isa = PBXBuildFile; fileRef = 3C05FD321744FE54005610D7 /* Shader.fsh */; };
 		3C05FD351744FE54005610D7 /* Shader.vsh in Resources */ = {isa = PBXBuildFile; fileRef = 3C05FD341744FE54005610D7 /* Shader.vsh */; };
 		3C15FE021750E5080043424E /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3C15FE011750E5080043424E /* ViewController.m */; };
-		3C782E111746E6AE00D41911 /* yeen1.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 3C782E101746E6AE00D41911 /* yeen1.jpg */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -46,7 +45,6 @@
 		3C05FD341744FE54005610D7 /* Shader.vsh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; name = Shader.vsh; path = Shaders/Shader.vsh; sourceTree = "<group>"; };
 		3C05FD361744FE54005610D7 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
 		3C15FE011750E5080043424E /* ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
-		3C782E101746E6AE00D41911 /* yeen1.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = yeen1.jpg; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -102,7 +100,6 @@
 				3C05FD2F1744FE54005610D7 /* MainStoryboard.storyboard */,
 				3C05FD321744FE54005610D7 /* Shader.fsh */,
 				3C05FD341744FE54005610D7 /* Shader.vsh */,
-				3C782E101746E6AE00D41911 /* yeen1.jpg */,
 				3C05FD361744FE54005610D7 /* ViewController.h */,
 				3C15FE011750E5080043424E /* ViewController.m */,
 				3C05FD1E1744FE54005610D7 /* Supporting Files */,
@@ -182,7 +179,6 @@
 				3C05FD311744FE54005610D7 /* MainStoryboard.storyboard in Resources */,
 				3C05FD331744FE54005610D7 /* Shader.fsh in Resources */,
 				3C05FD351744FE54005610D7 /* Shader.vsh in Resources */,
-				3C782E111746E6AE00D41911 /* yeen1.jpg in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
