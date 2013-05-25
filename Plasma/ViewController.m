@@ -19,9 +19,7 @@ enum
     UNIFORM_NORMAL_MATRIX,
     UNIFORM_TEXTURE,
     UNIFORM_TEX_COORD,
-    UNIFORM_A,
-    UNIFORM_Z,
-    UNIFORM_OFFSET,
+    UNIFORM_TIME,
     NUM_UNIFORMS
 };
 GLint uniforms[NUM_UNIFORMS];
@@ -42,13 +40,13 @@ GLint vertexCount;
     
     GLKMatrix4 _modelViewProjectionMatrix;
     
-    float _offset;
+    float _time;
     float _direction;
     
     GLuint _vertexArray;
     GLuint _vertexBuffer;
     
-    GLuint _texture;
+    //GLuint _texture;
 }
 @property (strong, nonatomic) EAGLContext *context;
 
@@ -143,7 +141,7 @@ GLint vertexCount;
     [EAGLContext setCurrentContext:self.context];
     
     [self loadShaders];
-    [self setupTextures];
+    //[self setupTextures];
     
     
     glEnable(GL_DEPTH_TEST);
@@ -183,17 +181,17 @@ GLint vertexCount;
 - (void)update
 {
     
-    _offset += self.timeSinceLastUpdate * 0.8f * _direction;
+    _time += self.timeSinceLastUpdate * 0.8f * _direction;
     //NSLog(@"offset %f",_offset);
     //if (_offset<0 || _offset>10)
     //{
     // _direction = -_direction;
     //}
     
-    if (_offset > 12.0 * M_PI)
+    if (_time > 12.0 * M_PI)
     {
-        NSLog(@"Offset %f",_offset);
-        _offset -= 12.0 * M_PI;
+        NSLog(@"Offset %f",_time);
+        _time -= 12.0 * M_PI;
     }
 }
 
@@ -204,12 +202,12 @@ GLint vertexCount;
     
     glBindVertexArrayOES(_vertexArray);
     
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, _texture);
-    glUniform1i(uniforms[UNIFORM_TEXTURE], 0);
-    glUniform1f(uniforms[UNIFORM_A], _rotation);
-    glUniform1f(uniforms[UNIFORM_Z], 0.6+cos(_zoom)/2);
-    glUniform1f(uniforms[UNIFORM_OFFSET], _offset);
+    //glActiveTexture(GL_TEXTURE0);
+    //glBindTexture(GL_TEXTURE_2D, _texture);
+    //glUniform1i(uniforms[UNIFORM_TEXTURE], 0);
+    //glUniform1f(uniforms[UNIFORM_A], _rotation);
+    //glUniform1f(uniforms[UNIFORM_Z], 0.6+cos(_zoom)/2);
+    glUniform1f(uniforms[UNIFORM_TIME], _time);
 
     // Render the object  with ES2
     glUseProgram(_program);
@@ -277,13 +275,11 @@ GLint vertexCount;
     // Get uniform locations.
     uniforms[UNIFORM_MODELVIEWPROJECTION_MATRIX] = glGetUniformLocation(_program, "modelViewProjectionMatrix");
     //uniforms[UNIFORM_NORMAL_MATRIX] = glGetUniformLocation(_program, "normalMatrix");
-    uniforms[UNIFORM_TEXTURE] = glGetUniformLocation(_program,"tex");
+    //uniforms[UNIFORM_TEXTURE] = glGetUniformLocation(_program,"tex");
     
     uniforms[UNIFORM_TEX_COORD] = glGetAttribLocation(_program, "TexCoordIn");
 
-    uniforms[UNIFORM_A] = glGetUniformLocation(_program, "a");
-    uniforms[UNIFORM_Z] = glGetUniformLocation(_program, "z");
-    uniforms[UNIFORM_OFFSET] = glGetUniformLocation(_program, "offset");
+    uniforms[UNIFORM_TIME] = glGetUniformLocation(_program, "time");
 
     
     // Release vertex and fragment shaders.
@@ -379,64 +375,5 @@ GLint vertexCount;
     return YES;
 }
 
-
-# pragma mark - texture helpers
-
-- (GLuint)setupTexture:(NSString *)fileName {
-    
-    //load file in to CGImage
-    CGImageRef spriteImage = [UIImage imageNamed:fileName].CGImage;
-    if (!spriteImage) {
-        NSLog(@"Failed to load image %@", fileName);
-        exit(1);
-    }
-    
-    size_t width = CGImageGetWidth(spriteImage);
-    size_t height = CGImageGetHeight(spriteImage);
-    
-#if defined(DEBUG)
-    //assert that the image is square
-    if (!( width == height ))
-    {
-        NSLog(@"Texture file %@ is not square (%zd by %zd px).",fileName,width,height);
-        exit(1);
-    }
-    //assert that dimensions are powers of two
-    if (width & (width - 1))
-    {
-        NSLog(@"Texture file %@ does not have dimensions that are a power of 2 (%zd by %zd px).",fileName,width,height);
-        exit(1);
-    }
-#endif
-    
-    //allocate memory for texture bytes and draw texture into them
-    GLubyte * spriteData = (GLubyte *) calloc(width*height*4, sizeof(GLubyte));
-    
-    //NOTE
-    //Do some colour depth checks and conversion here
-    CGContextRef spriteContext = CGBitmapContextCreate(spriteData, width, height, 8, width*4, CGImageGetColorSpace(spriteImage), kCGImageAlphaPremultipliedLast);
-    
-    CGContextDrawImage(spriteContext, CGRectMake(0, 0, width, height), spriteImage);
-    
-    CGContextRelease(spriteContext);
-    
-    //bind texture
-    GLuint texName;
-    glGenTextures(1, &texName);
-    glBindTexture(GL_TEXTURE_2D, texName);
-    
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, spriteData);
-    
-    free(spriteData);
-    return texName;
-    
-}
-
-- (void)setupTextures
-{
-    _texture=[self setupTexture:@"yeen1.jpg"];
-}
 
 @end

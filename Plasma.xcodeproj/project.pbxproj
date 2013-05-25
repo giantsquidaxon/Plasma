@@ -286,6 +286,7 @@
 				GCC_PREFIX_HEADER = "Plasma/Plasma-Prefix.pch";
 				INFOPLIST_FILE = "Plasma/Plasma-Info.plist";
 				PRODUCT_NAME = Plasma;
+				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -297,6 +298,7 @@
 				GCC_PREFIX_HEADER = "Plasma/Plasma-Prefix.pch";
 				INFOPLIST_FILE = "Plasma/Plasma-Info.plist";
 				PRODUCT_NAME = Plasma;
+				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
