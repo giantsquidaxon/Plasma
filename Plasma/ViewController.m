@@ -56,6 +56,7 @@ GLfloat gCubeVertexData[6*5] =
     float _rotation;
     float _zoom;
     float _offset;
+    float _direction;
     
     GLuint _vertexArray;
     GLuint _vertexBuffer;
@@ -91,6 +92,8 @@ GLfloat gCubeVertexData[6*5] =
     view.drawableDepthFormat = GLKViewDrawableDepthFormat24;
     
     [self setupGL];
+    
+    _direction = 1;
     
 }
 
@@ -179,12 +182,22 @@ GLfloat gCubeVertexData[6*5] =
     
     _modelViewProjectionMatrix = GLKMatrix4Multiply(projectionMatrix, modelViewMatrix);
     
-    _rotation += self.timeSinceLastUpdate * 0.5f;
+    _rotation += self.timeSinceLastUpdate * 1.0f;
     _rotation = _rotation > 2*M_PI ? _rotation - 2*M_PI : _rotation;
     _zoom += self.timeSinceLastUpdate * 0.8f;
     _zoom = _zoom > 2*M_PI ? _zoom - 2*M_PI : _zoom;
-    _offset += self.timeSinceLastUpdate * 0.1f;
-    _offset = _offset > 1 ? _offset - 1 : _offset;
+    _offset += self.timeSinceLastUpdate * 0.8f * _direction;
+    //NSLog(@"offset %f",_offset);
+    //if (_offset<0 || _offset>10)
+    //{
+       // _direction = -_direction;
+    //}
+
+    if (_offset > 12.0 * M_PI)
+    {
+        NSLog(@"Offset %f",_offset);
+        _offset -= 12.0 * M_PI;
+    }
 }
 
 - (void)glkView:(GLKView *)view drawInRect:(CGRect)rect
