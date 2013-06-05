@@ -32,6 +32,16 @@ enum
     NUM_ATTRIBUTES
 };
 
+// Palette index.
+enum
+{
+    PALETTE_MESCALINE,
+    PALETTE_NORMAL,
+    PALETTE_MIDNIGHT,
+    PALETTE_POSTER,
+    NUM_PALETTES
+};
+
 GLfloat * gVertexData;
 GLint vertexCount;
 
@@ -46,7 +56,8 @@ GLint vertexCount;
     GLuint _vertexArray;
     GLuint _vertexBuffer;
     
-    //GLuint _texture;
+    GLuint _texture;
+    
 }
 @property (strong, nonatomic) EAGLContext *context;
 
@@ -76,7 +87,7 @@ GLint vertexCount;
     view.drawableDepthFormat = GLKViewDrawableDepthFormat24;
     
     //set initial direction
-    _direction=1;
+    _direction = 1;
     
     //calculate aspect ratio of screen
     float aspect = fabsf(self.view.bounds.size.width / self.view.bounds.size.height);
@@ -102,7 +113,6 @@ GLint vertexCount;
      };
 
     vertexCount = 6*5;
-    
     
     //set up GL
     [self setupGL];
@@ -141,7 +151,7 @@ GLint vertexCount;
     [EAGLContext setCurrentContext:self.context];
     
     [self loadShaders];
-    //[self setupTextures];
+    _texture = [self generatePalette:PALETTE_NORMAL];
     
     
     glEnable(GL_DEPTH_TEST);
@@ -202,11 +212,9 @@ GLint vertexCount;
     
     glBindVertexArrayOES(_vertexArray);
     
-    //glActiveTexture(GL_TEXTURE0);
-    //glBindTexture(GL_TEXTURE_2D, _texture);
-    //glUniform1i(uniforms[UNIFORM_TEXTURE], 0);
-    //glUniform1f(uniforms[UNIFORM_A], _rotation);
-    //glUniform1f(uniforms[UNIFORM_Z], 0.6+cos(_zoom)/2);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, _texture);
+    glUniform1i(uniforms[UNIFORM_TEXTURE], 0);
     glUniform1f(uniforms[UNIFORM_TIME], _time);
 
     // Render the object  with ES2
@@ -275,7 +283,7 @@ GLint vertexCount;
     // Get uniform locations.
     uniforms[UNIFORM_MODELVIEWPROJECTION_MATRIX] = glGetUniformLocation(_program, "modelViewProjectionMatrix");
     //uniforms[UNIFORM_NORMAL_MATRIX] = glGetUniformLocation(_program, "normalMatrix");
-    //uniforms[UNIFORM_TEXTURE] = glGetUniformLocation(_program,"tex");
+    uniforms[UNIFORM_TEXTURE] = glGetUniformLocation(_program,"palette");
     
     uniforms[UNIFORM_TEX_COORD] = glGetAttribLocation(_program, "TexCoordIn");
 
@@ -375,5 +383,85 @@ GLint vertexCount;
     return YES;
 }
 
+- (GLuint)generatePalette:(unsigned int)palette
+{
+    //get memory for palette
+    unsigned int paletteSize = 512;
+    GLubyte * paletteData = (GLubyte *) calloc(paletteSize * 4, sizeof(GLubyte));
+    
+    //draw palette
+    unsigned char r;
+    unsigned char g;
+    unsigned char b;
+    for (int i = 0; i<paletteSize; i++)
+    {
+        float x = (float)i/(float)paletteSize;
+        switch (palette)
+        {
+            case PALETTE_MESCALINE :
+                r = 128 + 128 * sin(3.1415 * x * 16.0);
+                g = 128 + 128 * sin(3.1415 * x * 2.0);
+                b = 0;
+                break;
+                
+            case PALETTE_NORMAL :
+                r = 128 + 128 * sin(3.1415 * x * 8.0);
+                g = 128 + 128 * sin(3.1415 * x * 4.0);
+                b = 128 + 128 * sin(3.1415 * x * 2.0);
+                break;
+                
+            case PALETTE_MIDNIGHT :
+                r = 128 + 128 * sin(3.1415 * x * 2.0);
+                g = 128 + 128 * sin(3.1415 * x * 2.0);
+                b = 156 + 100 * sin(3.1415 * x * 2.0);
+                break;
+                
+            case PALETTE_POSTER :
+                r = 128 + 128 * sin(3.1415 * x * 16.0);
+                g = 128 + 128 * sin(3.1415 * x * 2.0);
+                r = r > 200 ? r : 0;
+                g = g > 200 ? g : 0;
+                b = 0;
+                
+                break;
+        }
+        paletteData[i * 4] = r;
+        paletteData[i * 4 + 1] = g;
+        paletteData[i * 4 + 2] = b;
+    };
+    
+
+    //bind texture
+    GLuint texName;
+    glGenTextures(1, &texName);
+    glBindTexture(GL_TEXTURE_2D, texName);
+    
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, paletteSize, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, paletteData);
+    
+    free(paletteData);
+    return texName;
+}
+
+- (IBAction) paletteA: (id)sender
+{
+    _texture=[self generatePalette:PALETTE_MESCALINE];
+}
+
+- (IBAction) paletteB: (id)sender
+{
+    _texture=[self generatePalette:PALETTE_NORMAL];
+}
+
+- (IBAction) paletteC: (id)sender
+{
+    _texture=[self generatePalette:PALETTE_MIDNIGHT];
+}
+
+- (IBAction) paletteD: (id)sender
+{
+    _texture=[self generatePalette:PALETTE_POSTER];
+}
 
 @end
