@@ -10,5 +10,11 @@
 #import <GLKit/GLKit.h>
 
 @interface ViewController : GLKViewController
+{
+    UILabel *FPSreadout;
+}
+
+@property (strong, nonatomic) IBOutlet UILabel *FPSreadout;
+
 
 @end

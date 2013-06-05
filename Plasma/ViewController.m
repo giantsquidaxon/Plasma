@@ -11,6 +11,7 @@
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 #define TEX_COORD_MAX   1.0f
 #define SQUARE_SIDE 0.99f
+#define FPSSAMPLES 30
 
 // Uniform index.
 enum
@@ -38,12 +39,13 @@ enum
     PALETTE_MESCALINE,
     PALETTE_NORMAL,
     PALETTE_MIDNIGHT,
-    PALETTE_POSTER,
     NUM_PALETTES
 };
 
 GLfloat * gVertexData;
 GLint vertexCount;
+float FPSsamples[FPSSAMPLES];
+int FPSsampleOffset = 0;
 
 @interface ViewController () {
     GLuint _program;
@@ -70,7 +72,11 @@ GLint vertexCount;
 - (BOOL)validateProgram:(GLuint)prog;
 @end
 
+
 @implementation ViewController
+
+@synthesize FPSreadout;
+
 
 - (void)viewDidLoad
 {
@@ -191,18 +197,34 @@ GLint vertexCount;
 - (void)update
 {
     
-    _time += self.timeSinceLastUpdate * 0.8f * _direction;
-    //NSLog(@"offset %f",_offset);
-    //if (_offset<0 || _offset>10)
-    //{
-    // _direction = -_direction;
-    //}
+    _time += self.timeSinceLastUpdate * 0.2f * _direction;
     
     if (_time > 12.0 * M_PI)
     {
-        NSLog(@"Offset %f",_time);
         _time -= 12.0 * M_PI;
     }
+    
+    [self updateFPS];
+
+}
+
+- (void) updateFPS
+{
+    if (FPSsampleOffset == FPSSAMPLES)
+    {
+        float FPSmin = FPSsamples[0];
+        float FPStotal = 0;
+        for (int i = 0; i<FPSSAMPLES; i++)
+        {
+            FPSmin = FPSmin < FPSsamples[i] ? FPSmin : FPSsamples[i];
+            FPStotal += FPSsamples[i];
+        }
+        
+        [FPSreadout setText:[NSString stringWithFormat:@" fps min:%04.1f \t avg:%04.1f", FPSmin, FPStotal / FPSSAMPLES]];
+
+        FPSsampleOffset = 0;
+    }
+    FPSsamples[FPSsampleOffset++] = 1.0 / self.timeSinceLastUpdate;
 }
 
 - (void)glkView:(GLKView *)view drawInRect:(CGRect)rect
@@ -385,8 +407,8 @@ GLint vertexCount;
 
 - (GLuint)generatePalette:(unsigned int)palette
 {
-    //get memory for palette
-    unsigned int paletteSize = 512;
+    //allocate memory for palette
+    unsigned int paletteSize = 1024;
     GLubyte * paletteData = (GLubyte *) calloc(paletteSize * 4, sizeof(GLubyte));
     
     //draw palette
@@ -395,7 +417,7 @@ GLint vertexCount;
     unsigned char b;
     for (int i = 0; i<paletteSize; i++)
     {
-        float x = (float)i/(float)paletteSize;
+        float x = (float)i / (float)paletteSize;
         switch (palette)
         {
             case PALETTE_MESCALINE :
@@ -415,15 +437,7 @@ GLint vertexCount;
                 g = 128 + 128 * sin(3.1415 * x * 2.0);
                 b = 156 + 100 * sin(3.1415 * x * 2.0);
                 break;
-                
-            case PALETTE_POSTER :
-                r = 128 + 128 * sin(3.1415 * x * 16.0);
-                g = 128 + 128 * sin(3.1415 * x * 2.0);
-                r = r > 200 ? r : 0;
-                g = g > 200 ? g : 0;
-                b = 0;
-                
-                break;
+
         }
         paletteData[i * 4] = r;
         paletteData[i * 4 + 1] = g;
@@ -457,11 +471,6 @@ GLint vertexCount;
 - (IBAction) paletteC: (id)sender
 {
     _texture=[self generatePalette:PALETTE_MIDNIGHT];
-}
-
-- (IBAction) paletteD: (id)sender
-{
-    _texture=[self generatePalette:PALETTE_POSTER];
 }
 
 @end
