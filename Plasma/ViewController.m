@@ -42,8 +42,11 @@ enum
     NUM_PALETTES
 };
 
+//vertices for quads
 GLfloat * gVertexData;
 GLint vertexCount;
+
+//framerate window to give framerate stats
 float FPSsamples[FPSSAMPLES];
 int FPSsampleOffset = 0;
 
@@ -53,7 +56,6 @@ int FPSsampleOffset = 0;
     GLKMatrix4 _modelViewProjectionMatrix;
     
     float _time;
-    float _direction;
     
     GLuint _vertexArray;
     GLuint _vertexBuffer;
@@ -61,11 +63,11 @@ int FPSsampleOffset = 0;
     GLuint _texture;
     
 }
+
 @property (strong, nonatomic) EAGLContext *context;
 
 - (void)setupGL;
 - (void)tearDownGL;
-
 - (BOOL)loadShaders;
 - (BOOL)compileShader:(GLuint *)shader type:(GLenum)type file:(NSString *)file;
 - (BOOL)linkProgram:(GLuint)prog;
@@ -92,9 +94,6 @@ int FPSsampleOffset = 0;
     view.context = self.context;
     view.drawableDepthFormat = GLKViewDrawableDepthFormat24;
     
-    //set initial direction
-    _direction = 1;
-    
     //calculate aspect ratio of screen
     float aspect = fabsf(self.view.bounds.size.width / self.view.bounds.size.height);
     
@@ -106,7 +105,7 @@ int FPSsampleOffset = 0;
                                                 0.0f, 0.0f, 0.0f, 1.0f);
     
     //make a quad that fills the screen
-    gVertexData = (GLfloat [6*5])
+    gVertexData = (GLfloat [6 * 5])
     {
         // Data layout for each line below is:
         // positionX, positionY, positionZ,     texX, texY,
@@ -118,7 +117,7 @@ int FPSsampleOffset = 0;
         aspect, 1.0f, 0.0f,          TEX_COORD_MAX, TEX_COORD_MAX/aspect
      };
 
-    vertexCount = 6*5;
+    vertexCount = 6 * 5;
     
     //set up GL
     [self setupGL];
@@ -197,7 +196,7 @@ int FPSsampleOffset = 0;
 - (void)update
 {
     
-    _time += self.timeSinceLastUpdate * 0.2f * _direction;
+    _time += self.timeSinceLastUpdate * 0.2f;
     
     if (_time > 12.0 * M_PI)
     {
@@ -206,25 +205,6 @@ int FPSsampleOffset = 0;
     
     [self updateFPS];
 
-}
-
-- (void) updateFPS
-{
-    if (FPSsampleOffset == FPSSAMPLES)
-    {
-        float FPSmin = FPSsamples[0];
-        float FPStotal = 0;
-        for (int i = 0; i<FPSSAMPLES; i++)
-        {
-            FPSmin = FPSmin < FPSsamples[i] ? FPSmin : FPSsamples[i];
-            FPStotal += FPSsamples[i];
-        }
-        
-        [FPSreadout setText:[NSString stringWithFormat:@" fps min:%04.1f \t avg:%04.1f", FPSmin, FPStotal / FPSSAMPLES]];
-
-        FPSsampleOffset = 0;
-    }
-    FPSsamples[FPSsampleOffset++] = 1.0 / self.timeSinceLastUpdate;
 }
 
 - (void)glkView:(GLKView *)view drawInRect:(CGRect)rect
@@ -246,6 +226,34 @@ int FPSsampleOffset = 0;
     
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }
+
+#pragma mark -  Collect frames per sec stats
+- (void) updateFPS
+{
+    //Collects FPSSAMPLES instantaneous frame rates then calculates stats on them for display
+    if (FPSsampleOffset == FPSSAMPLES)
+    {
+        //Compute stats
+        float FPSmin = FPSsamples[0];
+        float FPStotal = 0;
+        for (int i = 0; i<FPSSAMPLES; i++)
+        {
+            FPSmin = FPSmin < FPSsamples[i] ? FPSmin : FPSsamples[i];
+            FPStotal += FPSsamples[i];
+        }
+        
+        
+        //Display stats for last FPSSAMPLES frames
+        [FPSreadout setText:[NSString stringWithFormat:@" fps min:%04.1f \t avg:%04.1f", FPSmin, FPStotal / FPSSAMPLES]];
+        
+        //Back to start of buffer
+        FPSsampleOffset = 0;
+    }
+    
+    //Add last instantaneous frame rate to list
+    FPSsamples[FPSsampleOffset++] = 1.0 / self.timeSinceLastUpdate;
+}
+
 
 #pragma mark -  OpenGL ES 2 shader compilation
 
@@ -457,6 +465,8 @@ int FPSsampleOffset = 0;
     free(paletteData);
     return texName;
 }
+
+#pragma mark - Buttons for changing palette
 
 - (IBAction) paletteA: (id)sender
 {

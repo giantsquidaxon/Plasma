@@ -14,6 +14,10 @@
     UILabel *FPSreadout;
 }
 
+- (IBAction) paletteA: (id)sender;
+- (IBAction) paletteB: (id)sender;
+- (IBAction) paletteC: (id)sender;
+
 @property (strong, nonatomic) IBOutlet UILabel *FPSreadout;
 
 

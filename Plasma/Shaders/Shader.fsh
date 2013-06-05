@@ -16,7 +16,7 @@ void main()
     
     //Compute plasma
     mediump float v = 0.0;
-    mediump vec2 c = TexCoord * (5.0 + sin(time));
+    mediump vec2 c = TexCoord * (8.0 + sin(time));
     v += sin((c.x + time));
     v += sin((c.y + time) / 2.0);
     v += sin((c.x + c.y - time) / 3.0);
@@ -28,6 +28,8 @@ void main()
 //    mediump float g = 0.5 + 0.5 * sin(3.1415 * v * 2.0);
 //    mediump float b = 0.0;
 //    gl_FragColor = vec4(r,g,b,1.0);
+    
+    //Look up palette in texture
     gl_FragColor = texture2D(palette,vec2(v,1.0));
 
 }
